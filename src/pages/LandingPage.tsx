@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   Container,
   Typography,
@@ -15,7 +15,11 @@ import { styled, useTheme } from "@mui/material/styles";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import PersonIcon from "@mui/icons-material/Person";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
-import { useFetchClasses } from "../hooks/api";
+import { useFetchClasses, useBookingMutation } from "../hooks/api";
+import { useNavigate } from "react-router";
+import { useAuthStore } from "../store/authStore";
+import { toast } from "react-toastify";
+import heroImage from "../static/img/fitness-hero.jpg";
 
 // Styled components
 const StyledCard = styled(Card)(({ theme }) => ({
@@ -42,8 +46,7 @@ const InfoItem = styled(Box)({
 });
 
 const HeroSection = styled(Box)(({ theme }) => ({
-  background:
-    'linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url("/images/fitness-hero.jpg")',
+  background: `linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url("${heroImage}")`,
   backgroundSize: "cover",
   backgroundPosition: "center",
   color: "white",
@@ -56,29 +59,27 @@ const HeroSection = styled(Box)(({ theme }) => ({
 }));
 
 const LandingPage: React.FC = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const { isAuthenticated, user } = useAuthStore();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-
+  const navigate = useNavigate();
   const { isPending, isError, data, error } = useFetchClasses();
+  const bookingMutation = useBookingMutation(user?.id, user?.token);
 
-  // Simulate checking login status
-  useEffect(() => {
-    // In a real app, you would check if the user is logged in
-    // For demo purposes, we'll just set a value
-    const loggedIn = localStorage.getItem("isLoggedIn") === "true";
-    setIsLoggedIn(loggedIn);
-  }, []);
-
-  const handleBookNow = (classId: number) => {
-    if (!isLoggedIn) {
-      alert("Please log in to book a class");
+  const handleBookNow = async (classId: string) => {
+    if (!isAuthenticated) {
+      // alert("Please log in to book a class");
+      navigate("/login");
       return;
     }
 
-    // In a real app, you would make an API call to book the class
-    console.log(`Booking class with ID: ${classId}`);
-    alert(`Successfully booked class!`);
+    try {
+      await bookingMutation.mutateAsync(classId);
+      toast.success("Class booked successfully!");
+    } catch (error) {
+      console.error("Error booking class:", error);
+      toast.error(`Failed to book class. ${error}`);
+    }
   };
 
   return (
@@ -100,12 +101,12 @@ const LandingPage: React.FC = () => {
             Join our community and transform your life with our expert-led
             fitness classes
           </Typography>
-          {!isLoggedIn && (
+          {!isAuthenticated && (
             <Button
               variant="contained"
               color="primary"
               size="large"
-              onClick={() => alert("Navigate to login page")}
+              onClick={() => navigate("login")}
             >
               Sign In to Book Classes
             </Button>
@@ -205,10 +206,18 @@ const LandingPage: React.FC = () => {
                       fullWidth
                       variant="contained"
                       color="primary"
-                      disabled={!isLoggedIn || fitnessClass.remaining === 0}
+                      disabled={
+                        !isAuthenticated ||
+                        fitnessClass.remaining === 0 ||
+                        bookingMutation.isPending
+                      }
                       onClick={() => handleBookNow(fitnessClass.id)}
                     >
-                      {fitnessClass.remaining === 0 ? "Class Full" : "Book Now"}
+                      {bookingMutation.isPending
+                        ? "Booking..."
+                        : fitnessClass.remaining === 0
+                        ? "Class Full"
+                        : "Book Now"}
                     </Button>
                   </CardActions>
                 </StyledCard>
