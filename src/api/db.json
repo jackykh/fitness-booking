@@ -1,0 +1,52 @@
+{
+  "classes": [
+    {
+      "id": 1,
+      "name": "Morning Yoga",
+      "time": "06:00 AM - 07:00 AM",
+      "instructor": "Sarah Johnson",
+      "capacity": 20,
+      "remaining": 8
+    },
+    {
+      "id": 2,
+      "name": "HIIT Workout",
+      "time": "12:00 PM - 01:00 PM",
+      "instructor": "Mike Thompson",
+      "capacity": 15,
+      "remaining": 3
+    },
+    {
+      "id": 3,
+      "name": "Pilates",
+      "time": "05:30 PM - 06:30 PM",
+      "instructor": "Emma Davis",
+      "capacity": 12,
+      "remaining": 5
+    },
+    {
+      "id": 4,
+      "name": "Zumba",
+      "time": "07:00 PM - 08:00 PM",
+      "instructor": "Carlos Rodriguez",
+      "capacity": 25,
+      "remaining": 12
+    },
+    {
+      "id": 5,
+      "name": "Spin Class",
+      "time": "06:30 AM - 07:30 AM",
+      "instructor": "Jessica Miller",
+      "capacity": 18,
+      "remaining": 0
+    },
+    {
+      "id": 6,
+      "name": "Body Pump",
+      "time": "06:00 PM - 07:00 PM",
+      "instructor": "David Wilson",
+      "capacity": 15,
+      "remaining": 7
+    }
+  ]
+}
